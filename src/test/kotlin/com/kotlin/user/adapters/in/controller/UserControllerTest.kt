@@ -6,21 +6,21 @@ import com.kotlin.user.adapters.`in`.controller.request.UserRequest
 import com.kotlin.user.application.ports.`in`.InsertUserInputPort
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.doNothing
-import org.mockito.Mockito.doThrow
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@ExtendWith(SpringExtension::class)
 @WebMvcTest(UserController::class)
+@ContextConfiguration
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
     @Autowired
@@ -48,10 +48,12 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andExpect(status().isCreated)
+
+        verify(insertUserInputPort, times(1)).insert(request)
     }
 
     @Test
-    fun `shouold not insert user and return BAD_REQUEST status`() {
+    fun `should not insert user and return BAD_REQUEST status`() {
         val request = UserRequest("", "email@email.com", "123456")
 
         doNothing().`when`(insertUserInputPort).insert(request)
@@ -62,6 +64,8 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andExpect(status().isBadRequest)
+
+        verify(insertUserInputPort, times(0)).insert(request)
     }
 
     @Test
@@ -79,5 +83,7 @@ class UserControllerTest {
         )
             .andExpect(status().isUnprocessableEntity)
             .andExpect(content().string(expectedMessage))
+
+        verify(insertUserInputPort, times(1)).insert(userRequest)
     }
 }

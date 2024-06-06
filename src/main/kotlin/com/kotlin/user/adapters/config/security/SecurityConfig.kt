@@ -13,12 +13,16 @@ class SecurityConfig {
 
     @Bean
     fun authorizeRequests(http: HttpSecurity): SecurityFilterChain {
-        return http.authorizeHttpRequests { auth ->
-            auth
-                .requestMatchers(HttpMethod.POST, "/api/v1/user")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-        }.csrf().disable().build()
+        return http
+            .authorizeHttpRequests {
+                it
+                    .requestMatchers(HttpMethod.POST, "/api/v1/user")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }
+            .csrf()
+            .disable()
+            .build()
     }
 }
