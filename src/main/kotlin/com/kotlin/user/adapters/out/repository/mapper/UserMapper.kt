@@ -1,5 +1,6 @@
 package com.kotlin.user.adapters.out.repository.mapper
 
+import com.kotlin.user.adapters.`in`.controller.response.UserResponse
 import com.kotlin.user.adapters.out.repository.entity.UserEntity
 import com.kotlin.user.application.core.domain.User
 
@@ -16,5 +17,12 @@ fun toEntity(user: User): UserEntity {
         name = user.name,
         email = user.email,
         password = user.password
+    )
+}
+
+fun toUserResponse(entity: UserEntity): UserResponse {
+    return UserResponse(
+        email = entity.email,
+        name = entity.name
     )
 }
